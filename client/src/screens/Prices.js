@@ -1,7 +1,9 @@
-import React, {useState, useEffect} from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from "react-bootstrap/Navbar"
+import ExchangeTable from "../components/ExchangeTable"
+
 import axios from 'axios';
-import ExchangeTable from "../components/ExchangeTable" 
+
 
 function Prices() {
     const [baseCurrency, setBaseCurrency] = useState("");
@@ -11,30 +13,42 @@ function Prices() {
     useEffect(() => {
         async function fetchData() {
             try {
-                const resp = await axios.get("https://api.coinbase.com/v2/exchange-rates");
+                const resp = await axios.get("https://api.coinbase.com/v2/exchange-rates")
                 setBaseCurrency(resp.data.data.currency)
                 setExchangeRates(resp.data.data.rates)
                 setDoneLoading(true)
             } catch (error) {
                 alert(error)
             }
+            axios.get("/route/getAllExchangeRates").then((res => {
+                console.log(res)
+            }))
+            const req = {
+                fromCurrency: "USD",
+                toCurrency: "AED",
+                conversionRate: 0.8,
+            }
+            axios.post("/route/createExchangeRate", req).then((res) => {
+                console.log(res)
+            })
         }
-        fetchData()
+        fetchData();
     }, []);
 
     return (
-        <div>  
+        <div>
             <Navbar bg="dark" variant="dark">
                 <Navbar.Brand href="/">
-                CryptoCurrency Prices
+                    LandingPage
                 </Navbar.Brand>
             </Navbar>
-            {doneLoading ? 
-                <ExchangeTable exchangeRates={exchangeRates} baseCurrency={baseCurrency}/> :
+            {doneLoading ?
+                <ExchangeTable exchangeRates={exchangeRates} baseCurrency={baseCurrency} /> :
                 <h1>Loading Exchange Rates</h1>
             }
         </div>
-    )
+    );
+
 }
 
 export default Prices;
